@@ -83,14 +83,18 @@ print(f"Image shape: {train_images[0].shape}")
 
 """# **Loss Function**"""
 
-def custom_combo_loss(alpha,false_count):
+def custom_combo_loss(model,alpha,false_count):
     def loss_fn(y_true, y_pred):
 
         cnn_loss = K.categorical_crossentropy(y_true, y_pred)
 
         false_count1 = false_count/420
 
-        return (1 - alpha) * cnn_loss + alpha * false_count1
+        reg_loss = tf.add_n([
+            tf.reduce_mean(tf.abs(w))
+            for w in model.trainable_weights])
+
+        return (1 - alpha) * cnn_loss + alpha * false_count1*reg_loss
 
     return loss_fn
 
